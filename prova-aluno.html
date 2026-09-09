@@ -122,8 +122,9 @@
   .idrow{display:flex;flex-wrap:wrap;gap:12px;margin-top:16px}
   .field{display:flex;flex-direction:column;gap:4px;flex:1 1 220px}
   .field label{font-size:.72rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint)}
-  .field input{font-family:inherit;font-size:16px;font-weight:600;color:var(--ink);background:var(--panel);border:1.5px solid var(--line);border-radius:10px;padding:11px 12px;width:100%}
-  .field input:focus-visible{outline:2px solid var(--m2);outline-offset:1px;border-color:var(--m2)}
+  .field input,.field select{font-family:inherit;font-size:16px;font-weight:600;color:var(--ink);background:var(--panel);border:1.5px solid var(--line);border-radius:10px;padding:11px 12px;width:100%}
+  .field select:disabled{opacity:.55}
+  .field input:focus-visible,.field select:focus-visible{outline:2px solid var(--m2);outline-offset:1px;border-color:var(--m2)}
 
   .qlist{padding:8px 16px 4px;display:flex;flex-direction:column;gap:8px;counter-reset:q}
   .qcard{border:1px solid var(--line);border-radius:14px;padding:15px 15px;background:var(--panel)}
@@ -282,8 +283,8 @@
       <h2>Faça a prova até o fim</h2>
       <p>Responda as 20 questões, preencha nome e turma e toque em <b>“Enviar e corrigir”</b>. Você vê a nota na hora e a explicação de cada resposta. <b>Quem não fizer fica com a prova zerada.</b></p>
       <div class="idrow">
-        <div class="field"><label for="nome">Seu nome completo</label><input id="nome" type="text" autocomplete="name" placeholder="Ex.: Ana Souza"></div>
-        <div class="field"><label for="turma">Turma</label><input id="turma" type="text" autocomplete="off" placeholder="Ex.: 9º A"></div>
+        <div class="field"><label for="turma">Sua turma</label><select id="turma"><option value="">Selecione a turma…</option></select></div>
+        <div class="field"><label for="nome">Seu nome</label><select id="nome" disabled><option value="">Selecione a turma primeiro…</option></select></div>
       </div>
     </div>
 
@@ -316,6 +317,20 @@
    function cur(){var t=root.getAttribute('data-theme');return t?t:(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');}
    function paint(){btn.textContent=cur()==='dark'?'☀︎ Claro':'☾ Escuro';}
    btn.addEventListener('click',function(){root.setAttribute('data-theme',cur()==='dark'?'light':'dark');paint();});paint();})();
+
+  /* lista de alunos por turma */
+  var ROSTER = {"9º 1": ["ALICE LIMA", "ANA BEATRIZ", "ANA CLARA DA CRUZ", "ARTHUR MATHEUS", "ARTHUR VINICIUS", "BRENDA LOHANY", "CALEBE MENDES", "EMANUELY MARIA", "FERNANDA DUARTE", "GUILHERME CARDOSO", "HELOISA SAMPAIO", "ISABELA LOUISE", "ISABELLA MACEDO", "JAMILLE ESTEFANY", "JASMIM DA SILVA", "JOAO GUILHERME", "JOSE HENRIQUE MOURA", "JULIANY ROCHA", "KEVEN GUILHERME", "LAURA SOPHYA", "LAYANE KAROLINE", "LORRANA GABRIELLY", "LUCAS MAZETTI", "MARIA ALICE", "MARIA EDUARDA LACERDA", "MARIA EDUARDA LIMA", "MATEUS HENRIQUE", "MELISSA PAULA", "PEDRO GENTIL", "PEDRO IGOR", "PERICLES DANIEL", "RAONI FERREIRA", "RENATO GABRIEL", "SIDNEY SOUZA", "YASMIM BATISTA"], "9º 2": ["ANA CLAYRE", "ANA VITORIA", "ANNE BEATRIZ", "BREENDO RIBEIRO", "DANILO CAUE", "DYEGO MELO", "EMANUELY VITORIA", "GLENDA LARISSA", "GUSTAVO ARMSTRONG", "JHESSICA ALMEIDA", "JOAO CARLOS", "JOAO PEDRO", "JOAO VITOR", "JOSUE RAFAEL", "JULIA OLIVEIRA", "JULIANA SILVA", "KAUA GABRIEL", "KAYO ADRIANO", "LARA RUANA", "LETICIA TAVARES", "MARCO ANTONIO", "MARINA ALICE", "MELYSSA GLENDIANE", "MIKAELLY ALVES", "NIVALDO RODRIGUES", "PEDRO MESQUITA", "PEDRO VICTOR", "RAICCA GABRIELLE", "RAQUEL GAMA", "RENAN MATHEUS", "SALOMAO GOMES", "SELMA KAUANY", "SOPHIA PINHEIRO", "SOPHIA SILVA", "VICTOR GABRIEL", "YASMIN VITORIA"], "9º 4": ["ALEXSANDER DE OLIVEIRA", "ANA JULIA", "ANGELO GABRIEL", "ANNE BEATRICE", "ASAFE RHYETRO", "BRISA LOHAINY", "CARLOS EDUARDO", "DAVI OLIVEIRA", "EMILLY FERNANDA", "ERIKE LUIZ", "FABIO GONCALVES", "FERNANDO NASCIMENTO", "GUILHERME DA SILVA", "GUILHERME VALE", "ISMAEL GOMES", "JHON ANDREW", "JOSE VICTOR", "JOSUE NICHOLLAS", "KAUA CANTUARIO", "LUIZ FABIANO", "MANUELA SILVA", "MARIA EDUARDA", "MAYSA PYETRA", "NATHANAEL DUTRA", "PAULO SAMUEL", "PIETRO FERREIRA", "RENAN GOMES", "RENAN RAMOS", "SAMANTA VITORIA", "SAMILA HELOISA", "SARA CRISTINA", "SARA FERNANDA", "SARA VICTORIA", "SERGIO LUCAS", "THAYNNA RUANNE", "VITOR DANIEL"]};
+  (function(){
+    var tSel=document.getElementById('turma'), nSel=document.getElementById('nome');
+    Object.keys(ROSTER).forEach(function(t){var o=document.createElement('option');o.value=t;o.textContent=t;tSel.appendChild(o);});
+    tSel.addEventListener('change',function(){
+      nSel.innerHTML='';
+      var list=ROSTER[tSel.value]||[];
+      var ph=document.createElement('option');ph.value='';ph.textContent=list.length?'Selecione seu nome…':'Selecione a turma primeiro…';nSel.appendChild(ph);
+      list.forEach(function(n){var o=document.createElement('option');o.value=n;o.textContent=n;nSel.appendChild(o);});
+      nSel.disabled=!list.length;
+    });
+  })();
 
   /* supabase */
   var sb=null;
@@ -374,7 +389,7 @@
     var nome=document.getElementById('nome').value.trim();
     var turma=document.getElementById('turma').value.trim();
     var missing=[];for(var i=0;i<QUESTIONS.length;i++){if(chosen(i)===-1)missing.push(i+1);}
-    if(!nome||!turma){warn.hidden=false;warn.textContent='Preencha seu nome e sua turma antes de enviar.';return;}
+    if(!nome||!turma){warn.hidden=false;warn.textContent='Selecione sua turma e seu nome antes de enviar.';return;}
     if(missing.length){warn.hidden=false;warn.textContent='Faltou responder '+missing.length+' questão(ões): '+missing.join(', ')+'.';
       var f=qlist.querySelectorAll('.qcard')[missing[0]-1];if(f)f.scrollIntoView({behavior:'smooth',block:'center'});return;}
     warn.hidden=true;
