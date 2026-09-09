@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Acompanhamento — OLITEF 9º ano</title>
+<script>
+  const SUPABASE_URL      = "https://jndgmbmiahowwuildjxg.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_Mp2fcSPlp2TuR8l3fjGyQw_DFKEDNta";
+  const VIEW              = "andamento";
+  const ROSTER = {"9º 1": ["ALICE LIMA", "ANA BEATRIZ", "ANA CLARA DA CRUZ", "ARTHUR MATHEUS", "ARTHUR VINICIUS", "BRENDA LOHANY", "CALEBE MENDES", "EMANUELY MARIA", "FERNANDA DUARTE", "GUILHERME CARDOSO", "HELOISA SAMPAIO", "ISABELA LOUISE", "ISABELLA MACEDO", "JAMILLE ESTEFANY", "JASMIM DA SILVA", "JOAO GUILHERME", "JOSE HENRIQUE MOURA", "JULIANY ROCHA", "KEVEN GUILHERME", "LAURA SOPHYA", "LAYANE KAROLINE", "LORRANA GABRIELLY", "LUCAS MAZETTI", "MARIA ALICE", "MARIA EDUARDA LACERDA", "MARIA EDUARDA LIMA", "MATEUS HENRIQUE", "MELISSA PAULA", "PEDRO GENTIL", "PEDRO IGOR", "PERICLES DANIEL", "RAONI FERREIRA", "RENATO GABRIEL", "SIDNEY SOUZA", "YASMIM BATISTA"], "9º 2": ["ANA CLAYRE", "ANA VITORIA", "ANNE BEATRIZ", "BREENDO RIBEIRO", "DANILO CAUE", "DYEGO MELO", "EMANUELY VITORIA", "GLENDA LARISSA", "GUSTAVO ARMSTRONG", "JHESSICA ALMEIDA", "JOAO CARLOS", "JOAO PEDRO", "JOAO VITOR", "JOSUE RAFAEL", "JULIA OLIVEIRA", "JULIANA SILVA", "KAUA GABRIEL", "KAYO ADRIANO", "LARA RUANA", "LETICIA TAVARES", "MARCO ANTONIO", "MARINA ALICE", "MELYSSA GLENDIANE", "MIKAELLY ALVES", "NIVALDO RODRIGUES", "PEDRO MESQUITA", "PEDRO VICTOR", "RAICCA GABRIELLE", "RAQUEL GAMA", "RENAN MATHEUS", "SALOMAO GOMES", "SELMA KAUANY", "SOPHIA PINHEIRO", "SOPHIA SILVA", "VICTOR GABRIEL", "YASMIN VITORIA"], "9º 4": ["ALEXSANDER DE OLIVEIRA", "ANA JULIA", "ANGELO GABRIEL", "ANNE BEATRICE", "ASAFE RHYETRO", "BRISA LOHAINY", "CARLOS EDUARDO", "DAVI OLIVEIRA", "EMILLY FERNANDA", "ERIKE LUIZ", "FABIO GONCALVES", "FERNANDO NASCIMENTO", "GUILHERME DA SILVA", "GUILHERME VALE", "ISMAEL GOMES", "JHON ANDREW", "JOSE VICTOR", "JOSUE NICHOLLAS", "KAUA CANTUARIO", "LUIZ FABIANO", "MANUELA SILVA", "MARIA EDUARDA", "MAYSA PYETRA", "NATHANAEL DUTRA", "PAULO SAMUEL", "PIETRO FERREIRA", "RENAN GOMES", "RENAN RAMOS", "SAMANTA VITORIA", "SAMILA HELOISA", "SARA CRISTINA", "SARA FERNANDA", "SARA VICTORIA", "SERGIO LUCAS", "THAYNNA RUANNE", "VITOR DANIEL"]};
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Nunito:wght@400;700;800&display=swap">
+<style>
+  :root{
+    --ground:#F7F2E8;--panel:#FFFFFF;--panel-2:#FBF6EC;--ink:#2A2620;--ink-soft:#5C554A;--ink-faint:#8A8175;
+    --line:#E7DECB;--gold:#C6851A;--gold-soft:#F6E7C4;--m1:#1E9B67;--m1-soft:#E1F3EA;--m2:#2E6FB5;--m2-soft:#E1ECF7;
+    --warn:#C0431F;--warn-soft:#F8E4DC;--ok:#1E9B67;--ok-soft:#E1F3EA;
+    --shadow:0 1px 2px rgba(42,38,32,.05),0 6px 22px rgba(42,38,32,.07);--r:14px;
+  }
+  @media (prefers-color-scheme: dark){:root{
+    --ground:#141821;--panel:#1D232E;--panel-2:#232A37;--ink:#EDE7DA;--ink-soft:#B9B2A4;--ink-faint:#8B857A;
+    --line:#333B49;--gold:#E9B24A;--gold-soft:#3A3320;--m1:#4FC08D;--m1-soft:#183329;--m2:#6BA6E6;--m2-soft:#16283C;
+    --warn:#F08A63;--warn-soft:#3A241C;--ok:#4FC08D;--ok-soft:#183329;--shadow:0 1px 2px rgba(0,0,0,.3),0 6px 22px rgba(0,0,0,.35);
+  }}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:"Nunito",system-ui,sans-serif;line-height:1.5}
+  .wrap{max-width:1000px;margin:0 auto;padding:24px 16px 80px}
+  .head{background:radial-gradient(120% 140% at 12% 0%,var(--gold-soft) 0%,transparent 55%),var(--panel);border:1px solid var(--line);border-radius:20px;padding:24px 22px;box-shadow:var(--shadow);position:relative;overflow:hidden;margin-bottom:18px}
+  .head::before{content:"";position:absolute;inset:0;height:5px;background:linear-gradient(90deg,var(--m1),var(--gold) 50%,var(--m2))}
+  .eyebrow{font-size:.72rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin:4px 0 0}
+  h1{font-family:"Bricolage Grotesque","Nunito",sans-serif;font-weight:800;font-size:1.7rem;margin:.2em 0 .2em}
+  .sub{color:var(--ink-soft);margin:0;font-size:.95rem}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:16px 0}
+  .btn{font-family:inherit;font-weight:800;font-size:.95rem;color:#fff;background:var(--m2);border:none;border-radius:11px;padding:11px 20px;cursor:pointer;box-shadow:var(--shadow)}
+  .btn:hover{filter:brightness(1.05)}
+  .chip{font-family:inherit;font-weight:800;font-size:.9rem;padding:8px 14px;border-radius:999px;border:1.5px solid var(--line);background:var(--panel);color:var(--ink-soft);cursor:pointer}
+  .chip.active{background:var(--m2);color:#fff;border-color:var(--m2)}
+  .updated{font-size:.82rem;color:var(--ink-faint)}
+  .turma-block{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:16px 18px;margin-bottom:16px}
+  .turma-head{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:6px;margin-bottom:6px}
+  .turma-head h2{font-family:"Bricolage Grotesque","Nunito",sans-serif;font-weight:800;font-size:1.2rem;margin:0}
+  .bar{height:10px;border-radius:999px;background:var(--warn-soft);overflow:hidden;margin:8px 0 14px}
+  .bar>span{display:block;height:100%;background:var(--ok);border-radius:999px;transition:width .3s}
+  .count{font-weight:800;font-size:.95rem;color:var(--ink-soft)}
+  .count b{color:var(--ok)}
+  .grp-title{font-size:.72rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint);margin:12px 0 6px;display:flex;align-items:center;gap:6px}
+  .names{display:flex;flex-wrap:wrap;gap:7px}
+  .name{font-weight:700;font-size:.88rem;padding:6px 11px;border-radius:8px}
+  .name.ok{background:var(--ok-soft);color:var(--ok)}
+  .name.no{background:var(--warn-soft);color:var(--warn)}
+  .allok{color:var(--ok);font-weight:800}
+  .loading{color:var(--ink-faint);font-style:italic}
+  .foot{margin-top:20px;font-size:.82rem;color:var(--ink-faint);text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <p class="eyebrow">Atividade avaliativa · Matemática</p>
+    <h1>Acompanhamento da Prova — 9º ano (OLITEF)</h1>
+    <p class="sub">Veja em tempo real quem já concluiu a atividade online e quem ainda falta, por turma. Prazo: até <b>amanhã (10/09) às 5h</b>.</p>
+  </div>
+
+  <div class="row">
+    <button class="btn" id="reloadBtn">↻ Atualizar</button>
+    <div class="turma-filter" id="turmaFilter" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+    <span class="updated" id="updated"></span>
+  </div>
+
+  <div id="content"><p class="loading">Carregando…</p></div>
+
+  <p class="foot">Página de acompanhamento · as notas individuais não são exibidas aqui.</p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  var sb=null, DONE={}, FILTRO="__todas__";
+  function norm(s){return (s||'').toString().trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\*/g,'').replace(/\s+/g,' ');}
+  function esc(s){return (s||'').toString().replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+
+  try{ sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY); }catch(e){ sb=null; }
+
+  var tf=document.getElementById('turmaFilter');
+  var allb=document.createElement('button');allb.className='chip active';allb.textContent='Todas';allb.dataset.t='__todas__';tf.appendChild(allb);
+  Object.keys(ROSTER).forEach(function(t){var b=document.createElement('button');b.className='chip';b.textContent=t;b.dataset.t=t;tf.appendChild(b);});
+  tf.addEventListener('click',function(e){var b=e.target.closest('.chip');if(!b)return;FILTRO=b.dataset.t;
+    Array.prototype.forEach.call(tf.children,function(c){c.classList.toggle('active',c===b);});render();});
+  document.getElementById('reloadBtn').addEventListener('click',load);
+
+  async function load(){
+    if(!sb){document.getElementById('content').innerHTML='<p class="loading">Configuração ausente.</p>';return;}
+    try{
+      var res=await sb.from(VIEW).select('nome,turma');
+      if(res.error)throw res.error;
+      DONE={};
+      (res.data||[]).forEach(function(r){DONE[norm(r.turma)+'|'+norm(r.nome)]=true;});
+      var d=new Date();
+      document.getElementById('updated').textContent='Atualizado às '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);
+      render();
+    }catch(err){
+      document.getElementById('content').innerHTML='<p class="loading">Erro ao carregar: '+esc(err&&err.message?err.message:'')+'</p>';
+    }
+  }
+
+  function render(){
+    var turmas=Object.keys(ROSTER);
+    var show=(FILTRO==="__todas__")?turmas:[FILTRO];
+    var c=document.getElementById('content'); c.innerHTML='';
+    show.forEach(function(t){
+      var lista=ROSTER[t]||[];
+      var fez=lista.filter(function(n){return DONE[norm(t)+'|'+norm(n)];});
+      var faltam=lista.filter(function(n){return !DONE[norm(t)+'|'+norm(n)];});
+      var pct=lista.length?Math.round(fez.length/lista.length*100):0;
+      var div=document.createElement('div');div.className='turma-block';
+      div.innerHTML=
+        '<div class="turma-head"><h2>'+esc(t)+'</h2><span class="count"><b>'+fez.length+'</b> de '+lista.length+' fizeram · '+pct+'%</span></div>'+
+        '<div class="bar"><span style="width:'+pct+'%"></span></div>'+
+        '<div class="grp-title">❌ Ainda não fizeram ('+faltam.length+')</div>'+
+        (faltam.length?('<div class="names">'+faltam.map(function(n){return '<span class="name no">'+esc(n)+'</span>';}).join('')+'</div>'):'<div class="allok">🎉 Todos desta turma já fizeram!</div>')+
+        '<div class="grp-title">✅ Já fizeram ('+fez.length+')</div>'+
+        (fez.length?('<div class="names">'+fez.map(function(n){return '<span class="name ok">'+esc(n)+'</span>';}).join('')+'</div>'):'<div class="loading">Ninguém ainda.</div>');
+      c.appendChild(div);
+    });
+  }
+
+  load();
+  setInterval(load, 30000); // atualiza sozinho a cada 30s
+</script>
+</body>
+</html>
