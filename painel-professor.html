@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Painel do Professor — OLITEF</title>
+
+<!-- ================================================================= -->
+<!--  Use OS MESMOS valores da página do aluno.                        -->
+<!--  ATENÇÃO: NÃO compartilhe este arquivo com os alunos.             -->
+<!-- ================================================================= -->
+<script>
+  const SUPABASE_URL      = "https://jndgmbmiahowwuildjxg.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_Mp2fcSPlp2TuR8l3fjGyQw_DFKEDNta";
+  const TABELA            = "respostas";
+  const SENHA_PAINEL      = "prof2026";   // troque por uma senha sua
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Nunito:wght@400;700;800&display=swap">
+<style>
+  :root{
+    --ground:#F7F2E8;--panel:#FFFFFF;--panel-2:#FBF6EC;--ink:#2A2620;--ink-soft:#5C554A;--ink-faint:#8A8175;
+    --line:#E7DECB;--gold:#C6851A;--gold-soft:#F6E7C4;--m1:#1E9B67;--m1-soft:#E1F3EA;--m2:#2E6FB5;--m2-soft:#E1ECF7;
+    --warn:#C0431F;--warn-soft:#F8E4DC;--ok:#1E9B67;--ok-soft:#E1F3EA;
+    --shadow:0 1px 2px rgba(42,38,32,.05),0 6px 22px rgba(42,38,32,.07);--r:14px;
+  }
+  @media (prefers-color-scheme: dark){:root{
+    --ground:#141821;--panel:#1D232E;--panel-2:#232A37;--ink:#EDE7DA;--ink-soft:#B9B2A4;--ink-faint:#8B857A;
+    --line:#333B49;--gold:#E9B24A;--gold-soft:#3A3320;--m1:#4FC08D;--m1-soft:#183329;--m2:#6BA6E6;--m2-soft:#16283C;
+    --warn:#F08A63;--warn-soft:#3A241C;--ok:#4FC08D;--ok-soft:#183329;--shadow:0 1px 2px rgba(0,0,0,.3),0 6px 22px rgba(0,0,0,.35);
+  }}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:"Nunito",system-ui,sans-serif;line-height:1.5}
+  [hidden]{display:none!important}
+  .wrap{max-width:1080px;margin:0 auto;padding:24px 16px 80px}
+  h1{font-family:"Bricolage Grotesque","Nunito",sans-serif;font-weight:800;font-size:1.7rem;margin:0 0 4px}
+  .sub{color:var(--ink-soft);margin:0 0 20px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:18px;margin-bottom:16px}
+  label{font-size:.72rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint);display:block;margin-bottom:6px}
+  input,textarea{font-family:inherit;font-size:16px;color:var(--ink);background:var(--panel);border:1.5px solid var(--line);border-radius:10px;padding:11px 12px;width:100%}
+  textarea{min-height:120px;resize:vertical;font-weight:600}
+  input:focus-visible,textarea:focus-visible{outline:2px solid var(--m2);outline-offset:1px;border-color:var(--m2)}
+  .btn{font-family:inherit;font-weight:800;font-size:1rem;color:#fff;background:var(--m2);border:none;border-radius:11px;padding:12px 22px;cursor:pointer;box-shadow:var(--shadow)}
+  .btn:hover{filter:brightness(1.05)}
+  .btn.g{background:var(--m1)}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+  @media (max-width:640px){.stats{grid-template-columns:repeat(2,1fr)}}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;box-shadow:var(--shadow)}
+  .stat .n{font-family:"Bricolage Grotesque","Nunito",sans-serif;font-weight:800;font-size:1.9rem;line-height:1}
+  .stat .l{font-size:.78rem;color:var(--ink-faint);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-top:4px}
+  .stat.ok .n{color:var(--ok)} .stat.no .n{color:var(--warn)} .stat.m .n{color:var(--m2)} .stat.g .n{color:var(--gold)}
+  .section-title{font-family:"Bricolage Grotesque","Nunito",sans-serif;font-weight:800;font-size:1.15rem;margin:22px 0 10px;display:flex;align-items:center;gap:8px}
+  .table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+  table{border-collapse:collapse;width:100%;min-width:560px;background:var(--panel);font-size:.92rem}
+  th,td{text-align:left;padding:10px 14px;border-top:1px solid var(--line)}
+  thead th{background:var(--panel-2);font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-faint);font-weight:800;border-top:none}
+  td{color:var(--ink-soft)} td.name{color:var(--ink);font-weight:700}
+  td.grade{font-weight:800;font-variant-numeric:tabular-nums}
+  .pill{display:inline-block;font-size:.75rem;font-weight:800;padding:3px 9px;border-radius:999px}
+  .pill.ok{background:var(--ok-soft);color:var(--ok)} .pill.no{background:var(--warn-soft);color:var(--warn)}
+  .missing-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+  .miss{background:var(--warn-soft);color:var(--warn);font-weight:700;font-size:.88rem;padding:6px 11px;border-radius:8px}
+  .empty{color:var(--ink-faint);font-style:italic;padding:10px 2px}
+  .note{font-size:.85rem;color:var(--ink-soft);background:var(--gold-soft);border-left:3px solid var(--gold);border-radius:8px;padding:10px 12px;margin-top:10px}
+  .msg{color:var(--warn);font-weight:700;margin-top:8px}
+  #gate{max-width:420px;margin:60px auto}
+</style>
+</head>
+<body>
+
+<div id="gate" class="card">
+  <h1>Painel do Professor</h1>
+  <p class="sub">Digite a senha para ver os resultados.</p>
+  <label for="pw">Senha</label>
+  <input id="pw" type="password" placeholder="senha do painel">
+  <p class="msg" id="pwMsg" hidden>Senha incorreta.</p>
+  <div style="margin-top:12px"><button class="btn" id="enter">Entrar</button></div>
+</div>
+
+<div class="wrap" id="app" hidden>
+  <h1>Painel do Professor · OLITEF 2026</h1>
+  <p class="sub">Notas enviadas pelos alunos, em tempo real. Cole a lista da turma para ver quem ainda não fez.</p>
+
+  <div class="stats">
+    <div class="stat m"><div class="n" id="sTotal">–</div><div class="l">Provas enviadas</div></div>
+    <div class="stat ok"><div class="n" id="sFez">–</div><div class="l">Fizeram (da lista)</div></div>
+    <div class="stat no"><div class="n" id="sFalta">–</div><div class="l">Não fizeram</div></div>
+    <div class="stat g"><div class="n" id="sMedia">–</div><div class="l">Média da turma</div></div>
+  </div>
+
+  <div class="card">
+    <label for="roster">Lista da turma (um nome por linha)</label>
+    <textarea id="roster" placeholder="Ana Souza&#10;Bruno Lima&#10;Carla Nunes&#10;..."></textarea>
+    <div class="row" style="margin-top:12px">
+      <button class="btn g" id="checkBtn">Conferir quem fez / não fez</button>
+      <button class="btn" id="reloadBtn">Atualizar notas</button>
+    </div>
+    <div class="note">A comparação ignora maiúsculas/minúsculas e acentos. Se um aluno digitou o nome diferente da lista, ele aparece em “sem correspondência” abaixo.</div>
+  </div>
+
+  <div class="section-title">❌ Ainda não fizeram</div>
+  <div id="missingBox"><p class="empty">Cole a lista da turma e clique em “Conferir”.</p></div>
+
+  <div class="section-title">✅ Enviadas <span id="dupNote" style="font-size:.8rem;font-weight:700;color:var(--ink-faint)"></span></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Aluno</th><th>Turma</th><th>Nota</th><th>Acertos</th><th>Enviado em</th><th>Na lista?</th></tr></thead>
+      <tbody id="rows"><tr><td colspan="6" class="empty">Carregando…</td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  var gate=document.getElementById('gate'),app=document.getElementById('app');
+  document.getElementById('enter').addEventListener('click',tryEnter);
+  document.getElementById('pw').addEventListener('keydown',function(e){if(e.key==='Enter')tryEnter();});
+  function tryEnter(){
+    if(document.getElementById('pw').value===SENHA_PAINEL){gate.hidden=true;app.hidden=false;init();}
+    else{document.getElementById('pwMsg').hidden=false;}
+  }
+
+  var sb=null, DATA=[];
+  function norm(s){return (s||'').toString().trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ');}
+
+  function init(){
+    try{ sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY); }catch(e){ sb=null; }
+    document.getElementById('reloadBtn').addEventListener('click',load);
+    document.getElementById('checkBtn').addEventListener('click',function(){render();});
+    load();
+  }
+
+  async function load(){
+    if(!sb){document.getElementById('rows').innerHTML='<tr><td colspan="6" class="empty">Configuração do Supabase ausente. Preencha URL e chave no topo do arquivo.</td></tr>';return;}
+    document.getElementById('rows').innerHTML='<tr><td colspan="6" class="empty">Carregando…</td></tr>';
+    try{
+      var res=await sb.from(TABELA).select('*').order('criado_em',{ascending:false});
+      if(res.error)throw res.error;
+      DATA=res.data||[];render();
+    }catch(err){
+      document.getElementById('rows').innerHTML='<tr><td colspan="6" class="empty">Erro ao ler: '+(err&&err.message?err.message:'')+'</td></tr>';
+    }
+  }
+
+  function bestPerName(){
+    /* mantém a MAIOR nota por aluno (norm) para estatística e "fez" */
+    var map={};
+    DATA.forEach(function(r){var k=norm(r.nome);if(!map[k]||Number(r.nota)>Number(map[k].nota))map[k]=r;});
+    return map;
+  }
+
+  function render(){
+    var rowsEl=document.getElementById('rows');
+    document.getElementById('sTotal').textContent=DATA.length;
+
+    var roster=document.getElementById('roster').value.split('\n').map(function(x){return x.trim();}).filter(Boolean);
+    var rosterNorm=roster.map(norm);
+    var rosterSet={};rosterNorm.forEach(function(n,i){rosterSet[n]=roster[i];});
+    var submittedNorm={};DATA.forEach(function(r){submittedNorm[norm(r.nome)]=true;});
+
+    /* tabela */
+    if(!DATA.length){rowsEl.innerHTML='<tr><td colspan="6" class="empty">Nenhuma prova enviada ainda.</td></tr>';}
+    else{
+      rowsEl.innerHTML=DATA.map(function(r){
+        var t=r.criado_em?new Date(r.criado_em):null;
+        var quando=t?(('0'+t.getDate()).slice(-2)+'/'+('0'+(t.getMonth()+1)).slice(-2)+' '+('0'+t.getHours()).slice(-2)+':'+('0'+t.getMinutes()).slice(-2)):'—';
+        var na=roster.length?(rosterSet[norm(r.nome)]?'<span class="pill ok">sim</span>':'<span class="pill no">sem corresp.</span>'):'—';
+        var notaTxt=(Number(r.nota).toFixed(1)).replace('.',',');
+        return '<tr><td class="name">'+esc(r.nome)+'</td><td>'+esc(r.turma||'')+'</td><td class="grade">'+notaTxt+'</td><td>'+r.acertos+'/'+r.total+'</td><td>'+quando+'</td><td>'+na+'</td></tr>';
+      }).join('');
+    }
+
+    /* duplicadas */
+    var seen={},dups=0;DATA.forEach(function(r){var k=norm(r.nome);if(seen[k])dups++;seen[k]=true;});
+    document.getElementById('dupNote').textContent=dups?('· '+dups+' reenvio(s)'):'';
+
+    /* estatística por aluno único */
+    var best=bestPerName();
+    var uniq=Object.keys(best);
+    var media = uniq.length ? (uniq.reduce(function(a,k){return a+Number(best[k].nota);},0)/uniq.length) : 0;
+    document.getElementById('sMedia').textContent=uniq.length?media.toFixed(1).replace('.',','):'–';
+
+    /* fez / não fez em relação à lista */
+    var missingBox=document.getElementById('missingBox');
+    if(!roster.length){
+      document.getElementById('sFez').textContent='–';
+      document.getElementById('sFalta').textContent='–';
+      missingBox.innerHTML='<p class="empty">Cole a lista da turma e clique em “Conferir”.</p>';
+      return;
+    }
+    var fez=0,faltam=[];
+    rosterNorm.forEach(function(n,i){ if(submittedNorm[n])fez++; else faltam.push(roster[i]); });
+    document.getElementById('sFez').textContent=fez;
+    document.getElementById('sFalta').textContent=faltam.length;
+    missingBox.innerHTML = faltam.length
+      ? '<div class="missing-list">'+faltam.map(function(n){return '<span class="miss">'+esc(n)+'</span>';}).join('')+'</div>'
+      : '<p class="empty" style="color:var(--ok)">🎉 Todos da lista já enviaram!</p>';
+  }
+
+  function esc(s){return (s||'').toString().replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+</script>
+</body>
+</html>

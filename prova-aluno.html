@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Revisão + Prova — OLITEF</title>
+
+<!-- ================================================================= -->
+<!--  CONFIGURAÇÃO DO SUPABASE  —  cole seus dois valores aqui abaixo   -->
+<!--  (a chave "anon public" pode ficar aqui; NUNCA use a service_role) -->
+<!-- ================================================================= -->
+<script>
+  const SUPABASE_URL      = "https://jndgmbmiahowwuildjxg.supabase.co";   // ex.: https://abcdxyz.supabase.co
+  const SUPABASE_ANON_KEY = "sb_publishable_Mp2fcSPlp2TuR8l3fjGyQw_DFKEDNta";       // chave "anon public"
+  const TABELA            = "respostas";                    // não precisa mudar
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Nunito:ital,wght@0,400;0,700;0,800;1,700&display=swap">
+<style>
+  :root{
+    --ground:#F7F2E8;--panel:#FFFFFF;--panel-2:#FBF6EC;--ink:#2A2620;--ink-soft:#5C554A;--ink-faint:#8A8175;
+    --line:#E7DECB;--gold:#C6851A;--gold-soft:#F6E7C4;--m1:#1E9B67;--m1-soft:#E1F3EA;--m2:#2E6FB5;--m2-soft:#E1ECF7;
+    --m3:#8A4F9E;--m3-soft:#EFE4F4;--warn:#C0431F;--warn-soft:#F8E4DC;--ok:#1E9B67;--ok-soft:#E1F3EA;
+    --shadow:0 1px 2px rgba(42,38,32,.05),0 6px 22px rgba(42,38,32,.07);
+    --shadow-lift:0 2px 6px rgba(42,38,32,.08),0 14px 40px rgba(42,38,32,.12);
+    --r:16px;--maxw:1120px;--fmono:"Nunito",ui-monospace,monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#141821;--panel:#1D232E;--panel-2:#232A37;--ink:#EDE7DA;--ink-soft:#B9B2A4;--ink-faint:#8B857A;
+      --line:#333B49;--gold:#E9B24A;--gold-soft:#3A3320;--m1:#4FC08D;--m1-soft:#183329;--m2:#6BA6E6;--m2-soft:#16283C;
+      --m3:#C08BD4;--m3-soft:#2C2035;--warn:#F08A63;--warn-soft:#3A241C;--ok:#4FC08D;--ok-soft:#183329;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 22px rgba(0,0,0,.35);--shadow-lift:0 2px 6px rgba(0,0,0,.35),0 14px 40px rgba(0,0,0,.5);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#141821;--panel:#1D232E;--panel-2:#232A37;--ink:#EDE7DA;--ink-soft:#B9B2A4;--ink-faint:#8B857A;
+    --line:#333B49;--gold:#E9B24A;--gold-soft:#3A3320;--m1:#4FC08D;--m1-soft:#183329;--m2:#6BA6E6;--m2-soft:#16283C;
+    --m3:#C08BD4;--m3-soft:#2C2035;--warn:#F08A63;--warn-soft:#3A241C;--ok:#4FC08D;--ok-soft:#183329;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 22px rgba(0,0,0,.35);--shadow-lift:0 2px 6px rgba(0,0,0,.35),0 14px 40px rgba(0,0,0,.5);
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased}
+  img{max-width:100%}
+  [hidden]{display:none!important}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:24px 16px 90px}
+
+  .hub{position:relative;background:radial-gradient(120% 140% at 15% 0%,var(--gold-soft) 0%,transparent 55%),var(--panel);border:1px solid var(--line);border-radius:22px;padding:26px 24px 24px;box-shadow:var(--shadow-lift);overflow:hidden}
+  .hub::before{content:"";position:absolute;inset:0;height:6px;background:linear-gradient(90deg,var(--m1),var(--gold) 45%,var(--m2) 70%,var(--m3))}
+  .eyebrow{font-size:.72rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin:6px 0 0}
+  h1{font-family:"Bricolage Grotesque","Nunito",sans-serif;font-weight:800;font-size:clamp(1.6rem,6vw,2.9rem);line-height:1.05;letter-spacing:-.02em;text-wrap:balance;margin:.28em 0 .3em}
+  h1 .coin{color:var(--gold)}
+  .lede{max-width:60ch;color:var(--ink-soft);font-size:1rem;margin:0}
+  .meta{display:flex;flex-wrap:wrap;gap:8px 10px;margin-top:16px}
+  .chip{display:inline-flex;align-items:center;gap:7px;font-size:.8rem;font-weight:700;padding:6px 12px;border-radius:999px;background:var(--panel-2);border:1px solid var(--line);color:var(--ink-soft)}
+  .chip b{color:var(--ink);font-weight:800}
+  .dot{width:9px;height:9px;border-radius:50%;flex:none}
+  .howto{margin:14px 2px 0;font-size:.92rem;color:var(--ink-soft)}
+  .howto b{color:var(--ink)}
+
+  .branches{display:grid;gap:18px;margin-top:24px;grid-template-columns:repeat(3,1fr)}
+  @media (max-width:900px){.branches{grid-template-columns:1fr}}
+  .branch{--c:var(--m1);--c-soft:var(--m1-soft);background:var(--panel);border:1px solid var(--line);border-top:4px solid var(--c);border-radius:var(--r);box-shadow:var(--shadow);display:flex;flex-direction:column;overflow:hidden}
+  .branch.m2{--c:var(--m2);--c-soft:var(--m2-soft)}
+  .branch.m3{--c:var(--m3);--c-soft:var(--m3-soft)}
+  .branch-head{padding:16px 18px 12px;background:var(--c-soft)}
+  .branch-tag{font-size:.7rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--c)}
+  .branch-title{font-family:"Bricolage Grotesque","Nunito",sans-serif;font-weight:800;font-size:1.2rem;line-height:1.1;margin:3px 0 2px;color:var(--ink)}
+  .branch-sub{font-size:.82rem;color:var(--ink-soft)}
+  .nodes{padding:14px;display:flex;flex-direction:column;gap:12px}
+  .node{background:var(--panel-2);border:1px solid var(--line);border-left:3px solid var(--c);border-radius:12px;padding:12px 13px 13px}
+  .node h3{font-size:.96rem;font-weight:800;margin:0 0 4px;color:var(--ink);display:flex;gap:8px;align-items:baseline}
+  .qn{font-size:.64rem;font-weight:800;color:#fff;background:var(--c);padding:2px 7px;border-radius:6px;flex:none}
+  .node p{margin:0;font-size:.9rem;color:var(--ink-soft)}
+  .node p+p{margin-top:6px}
+  .key{color:var(--ink);font-weight:800}
+  .formula{font-family:var(--fmono);font-weight:800;display:inline-block;margin-top:8px;background:var(--c-soft);color:var(--ink);border-radius:8px;padding:5px 9px;font-size:.85rem}
+  .tip{margin-top:9px;font-size:.82rem;color:var(--ink);background:var(--warn-soft);border-radius:8px;padding:7px 10px;border-left:3px solid var(--warn)}
+  .tip b{color:var(--warn)}
+  .steps{margin:8px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px}
+  .steps li{font-size:.86rem;color:var(--ink-soft);padding-left:16px;position:relative}
+  .steps li::before{content:"→";position:absolute;left:0;color:var(--c);font-weight:800}
+
+  .section-label{display:flex;align-items:center;gap:12px;margin:34px 2px 14px}
+  .section-label h2{font-family:"Bricolage Grotesque","Nunito",sans-serif;font-weight:800;font-size:1.3rem;margin:0}
+  .section-label::after{content:"";height:1px;background:var(--line);flex:1}
+
+  .table-wrap{overflow-x:auto;border-radius:var(--r);border:1px solid var(--line);box-shadow:var(--shadow);-webkit-overflow-scrolling:touch}
+  table{border-collapse:collapse;width:100%;min-width:500px;background:var(--panel);font-size:.9rem}
+  caption{text-align:left;padding:12px 16px;font-size:.85rem;color:var(--ink-soft);background:var(--panel-2)}
+  th,td{text-align:left;padding:11px 15px;border-top:1px solid var(--line);vertical-align:top}
+  thead th{background:var(--panel-2);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);font-weight:800}
+  tbody th{font-weight:800;color:var(--ink);white-space:nowrap}
+  td{color:var(--ink-soft)}
+  .sig{font-family:var(--fmono);font-weight:800;color:var(--gold)}
+
+  .fgrid{display:grid;gap:14px;grid-template-columns:repeat(3,1fr)}
+  @media (max-width:820px){.fgrid{grid-template-columns:1fr}}
+  .fcard{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px;box-shadow:var(--shadow)}
+  .fcard .lbl{font-size:.72rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--gold)}
+  .fcard .big{font-family:var(--fmono);font-weight:800;font-size:1.05rem;color:var(--ink);margin:8px 0;background:var(--gold-soft);border-radius:10px;padding:10px 12px;text-align:center}
+  .fcard p{margin:0;font-size:.85rem;color:var(--ink-soft)}
+  .fcard .ex{margin-top:8px;color:var(--ink)}
+  .fcard .ex b{color:var(--gold)}
+
+  .peg{display:grid;gap:12px;grid-template-columns:repeat(2,1fr)}
+  @media (max-width:720px){.peg{grid-template-columns:1fr}}
+  .pcard{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:13px 15px;box-shadow:var(--shadow);border-left:4px solid var(--warn)}
+  .pcard h4{margin:0 0 4px;font-size:.95rem;font-weight:800;color:var(--ink)}
+  .pcard p{margin:0;font-size:.86rem;color:var(--ink-soft)}
+  .pcard .ok{color:var(--ok);font-weight:800}
+  .pcard .no{color:var(--warn);font-weight:800}
+
+  .exam{margin-top:18px;background:var(--panel);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow-lift);overflow:hidden}
+  .exam-head{padding:22px 20px 18px;background:radial-gradient(130% 130% at 90% 0%,var(--m2-soft) 0%,transparent 60%),var(--panel-2);border-bottom:1px solid var(--line)}
+  .exam-head .badge{display:inline-block;font-size:.7rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#fff;background:var(--warn);padding:4px 10px;border-radius:999px}
+  .exam-head h2{font-family:"Bricolage Grotesque","Nunito",sans-serif;font-weight:800;font-size:1.4rem;margin:10px 0 4px}
+  .exam-head p{margin:0;color:var(--ink-soft);font-size:.92rem;max-width:62ch}
+  .idrow{display:flex;flex-wrap:wrap;gap:12px;margin-top:16px}
+  .field{display:flex;flex-direction:column;gap:4px;flex:1 1 220px}
+  .field label{font-size:.72rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint)}
+  .field input{font-family:inherit;font-size:16px;font-weight:600;color:var(--ink);background:var(--panel);border:1.5px solid var(--line);border-radius:10px;padding:11px 12px;width:100%}
+  .field input:focus-visible{outline:2px solid var(--m2);outline-offset:1px;border-color:var(--m2)}
+
+  .qlist{padding:8px 16px 4px;display:flex;flex-direction:column;gap:8px;counter-reset:q}
+  .qcard{border:1px solid var(--line);border-radius:14px;padding:15px 15px;background:var(--panel)}
+  .qcard .qtext{font-weight:800;color:var(--ink);font-size:1rem;margin:0 0 11px;display:flex;gap:10px;align-items:baseline}
+  .qcard .qtext::before{counter-increment:q;content:counter(q);flex:none;font-family:"Bricolage Grotesque","Nunito",sans-serif;font-size:.82rem;font-weight:800;color:#fff;background:var(--m2);width:24px;height:24px;border-radius:7px;display:inline-flex;align-items:center;justify-content:center}
+  .opts{display:flex;flex-direction:column;gap:7px}
+  .opt{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-start;padding:11px 12px;border:1.5px solid var(--line);border-radius:10px;cursor:pointer;font-size:.92rem;color:var(--ink);background:var(--panel);transition:border-color .12s,background .12s}
+  .opt:hover{border-color:var(--m2)}
+  .opt input{margin:2px 0 0;flex:none;accent-color:var(--m2);width:18px;height:18px}
+  .opt .lt{font-weight:800;color:var(--ink-faint);flex:none}
+  .opt .ot{flex:1 1 60%}
+  .exam.done .opt{cursor:default}
+  .opt.correct{border-color:var(--ok);background:var(--ok-soft)}
+  .opt.correct .lt{color:var(--ok)}
+  .opt.wrong{border-color:var(--warn);background:var(--warn-soft)}
+  .opt.wrong .lt{color:var(--warn)}
+  .mark{font-weight:800;font-size:.78rem;flex:none;margin-left:auto}
+  .opt.correct .mark{color:var(--ok)}
+  .opt.wrong .mark{color:var(--warn)}
+  .expl{margin-top:10px;font-size:.86rem;color:var(--ink);background:var(--m2-soft);border-radius:9px;padding:9px 12px;border-left:3px solid var(--m2)}
+  .expl b{color:var(--m2)}
+
+  .actionbar{padding:16px 16px 22px;display:flex;flex-direction:column;gap:10px;align-items:center}
+  .btn{font-family:inherit;font-weight:800;font-size:1.05rem;color:#fff;background:var(--m1);border:none;border-radius:12px;padding:15px 30px;cursor:pointer;box-shadow:var(--shadow);width:100%;max-width:360px}
+  .btn:hover{filter:brightness(1.05)}
+  .btn:active{transform:translateY(1px)}
+  .btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+  .btn.secondary{background:var(--panel-2);color:var(--ink);border:1.5px solid var(--line);box-shadow:none}
+  .btn[disabled]{opacity:.6;cursor:default}
+  .warnmsg{color:var(--warn);font-weight:700;font-size:.9rem;text-align:center;margin:0}
+
+  .result{border-radius:16px;padding:20px 20px;margin:0 16px 6px;border:1px solid var(--line);background:var(--panel-2);text-align:center}
+  .result .who{font-weight:800;color:var(--ink);font-size:1.05rem}
+  .result .score{font-family:"Bricolage Grotesque","Nunito",sans-serif;font-weight:800;font-size:2.4rem;line-height:1;margin:6px 0 2px}
+  .result .sub{color:var(--ink-soft);font-size:.9rem;margin-top:4px}
+  .result .band{display:inline-block;margin-top:12px;font-weight:800;padding:6px 14px;border-radius:999px;font-size:.9rem}
+  .sendstate{margin-top:12px;font-size:.88rem;font-weight:700}
+  .sendstate.okmsg{color:var(--ok)}
+  .sendstate.errmsg{color:var(--warn)}
+
+  footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);font-size:.82rem;color:var(--ink-faint);text-align:center}
+  footer b{color:var(--ink-soft)}
+  .theme-toggle{position:fixed;top:12px;right:12px;z-index:20;background:var(--panel);border:1px solid var(--line);color:var(--ink-soft);border-radius:999px;padding:8px 13px;font-family:inherit;font-weight:800;font-size:.8rem;cursor:pointer;box-shadow:var(--shadow)}
+  .theme-toggle:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+  @media (max-width:560px){
+    .wrap{padding:20px 12px 80px}
+    .hub{padding:22px 16px 18px}
+    .exam-head,.qlist{padding-left:12px;padding-right:12px}
+    .result{margin-left:12px;margin-right:12px}
+    .section-label h2{font-size:1.15rem}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+
+<button class="theme-toggle" id="themeBtn" aria-label="Alternar tema claro/escuro">Tema</button>
+
+<div class="wrap">
+
+  <header class="hub">
+    <p class="eyebrow">Revisão + Prova · Educação Financeira</p>
+    <h1>Revisão e Prova — Simulado <span class="coin">OLITEF 2026</span></h1>
+    <p class="lede">Primeiro <b>revise</b> o mapa mental com tudo o que caiu (Nível 2 · 8º e 9º anos). Depois <b>faça a prova de 20 questões</b> no fim: ela corrige na hora, mostra sua nota e explica cada resposta. Sua nota é enviada automaticamente ao professor. 💪</p>
+    <div class="meta">
+      <span class="chip"><span class="dot" style="background:var(--m1)"></span> Ed. Financeira <b>Q1–10</b></span>
+      <span class="chip"><span class="dot" style="background:var(--m2)"></span> Renda Fixa <b>Q11–18</b></span>
+      <span class="chip"><span class="dot" style="background:var(--m3)"></span> Renda Variável <b>Q19–20</b></span>
+      <span class="chip">📝 <b>Prova: 20 questões</b></span>
+    </div>
+  </header>
+
+  <p class="howto">No mapa: caixas <b style="color:var(--gold)">douradas</b> são fórmulas, caixas <b style="color:var(--warn)">vermelhas</b> são pegadinhas. Depois de revisar, desça até a <b>PROVA</b>.</p>
+
+  <div class="branches">
+    <section class="branch m1">
+      <div class="branch-head"><div class="branch-tag">MA01 · Módulo 1</div><h2 class="branch-title">Educação Financeira Básica</h2><div class="branch-sub">Dinheiro, orçamento, inflação e juros</div></div>
+      <div class="nodes">
+        <div class="node"><h3><span class="qn">Q1</span> Escambo &amp; funções do dinheiro</h3><p><span class="key">Escambo</span> = troca direta de bens/serviços, sem dinheiro.</p><p>Na <span class="key">hiperinflação</span>, o dinheiro perde as funções de <span class="key">reserva de valor</span> e <span class="key">meio de troca</span>.</p></div>
+        <div class="node"><h3><span class="qn">Q2</span> Pix</h3><p><span class="key">Pagamentos instantâneos</span> geridos pelo <span class="key">Banco Central do Brasil</span>.</p><p>No exterior não funciona: usar <span class="key">moeda local ou cartões internacionais</span>.</p></div>
+        <div class="node"><h3><span class="qn">Q3</span> Renda × despesa</h3><p>A <span class="key">renda total</span> é a soma das despesas mais o que sobrou.</p><span class="formula">Renda = despesas + sobra</span></div>
+        <div class="node"><h3><span class="qn">Q4</span> Juros simples × compostos</h3><p><span class="key">Simples:</span> sempre sobre o valor inicial → cresce em linha reta.</p><p><span class="key">Compostos:</span> "juros sobre juros", sobre o saldo que vai crescendo → rende mais no tempo.</p></div>
+        <div class="node"><h3><span class="qn">Q5</span> Contar juros compostos (passo a passo)</h3><p>10% ao mês sobre R$ 400, em 2 meses — some mês a mês:</p><ul class="steps"><li>1º mês: 10% de 400 = R$ 40 → saldo R$ 440</li><li>2º mês: 10% de 440 = R$ 44 → saldo <span class="key">R$ 484</span></li></ul></div>
+        <div class="node"><h3><span class="qn">Q6</span> Aumento e desconto em %</h3><p>R$ 200 com +25% e depois −20% <span class="key">volta a R$ 200</span>:</p><ul class="steps"><li>+25% de 200 = +50 → R$ 250</li><li>−20% de 250 = −50 → R$ 200</li></ul><div class="tip"><b>Pegadinha:</b> nunca faça 25% − 20% = 5%!</div></div>
+        <div class="node"><h3><span class="qn">Q7</span> PIB</h3><p><span class="key">Produto Interno Bruto</span> = soma de todos os bens e serviços finais do país.</p><p>Mede o <span class="key">nível de atividade econômica</span>.</p></div>
+        <div class="node"><h3><span class="qn">Q8</span> Reajuste pelo custo de vida</h3><p>Para acompanhar a inflação, usa-se o <span class="key">IPCA</span> — índice oficial.</p><div class="tip"><b>Não confunda:</b> Selic e CDI são juros; PIB é produção. Só o IPCA reajusta preço.</div></div>
+        <div class="node"><h3><span class="qn">Q9</span> Partes da parcela</h3><p>Prestação = <span class="key">amortização</span> (abate a dívida) + <span class="key">juros</span> (custo do dinheiro).</p></div>
+        <div class="node"><h3><span class="qn">Q10</span> Renda perpétua (reserva)</h3><p>Quanto acumular para viver só dos rendimentos? Divide a renda pela taxa mensal.</p><span class="formula">Capital = renda ÷ taxa → 5.000 ÷ 0,005 = R$ 1.000.000</span></div>
+      </div>
+    </section>
+
+    <section class="branch m2">
+      <div class="branch-head"><div class="branch-tag">MA02 · Módulo 2</div><h2 class="branch-title">Renda Fixa</h2><div class="branch-sub">Títulos, proteção e rendimentos previsíveis</div></div>
+      <div class="nodes">
+        <div class="node"><h3><span class="qn">Q11</span> FGC</h3><p><span class="key">Fundo Garantidor de Créditos</span> protege contra o <span class="key">risco de crédito</span> (o "calote").</p><p>Cobre até <span class="key">R$ 250.000 por CPF</span>.</p></div>
+        <div class="node"><h3><span class="qn">Q12</span> Poupança</h3><p>Criada em <span class="key">1861</span>, por <span class="key">Dom Pedro II</span> — dos investimentos mais antigos do Brasil.</p></div>
+        <div class="node"><h3><span class="qn">Q13</span> Proteção contra a inflação</h3><p>Render <span class="key">acima da inflação</span> e proteger o poder de compra: <span class="key">Tesouro IPCA+</span> (IPCA + taxa fixa).</p></div>
+        <div class="node"><h3><span class="qn">Q14</span> Tesouro Direto</h3><p>Programa de <span class="key">2002</span>, parceria do <span class="key">Tesouro Nacional</span> com a <span class="key">B3</span>.</p></div>
+        <div class="node"><h3><span class="qn">Q15</span> Rendimento em renda fixa (passo a passo)</h3><p>1% ao mês em R$ 1.000, por 2 meses:</p><ul class="steps"><li>1º mês: 1% de 1.000 = R$ 10 → saldo R$ 1.010</li><li>2º mês: 1% de 1.010 = R$ 10,10 → <span class="key">R$ 1.020,10</span></li></ul><div class="tip"><b>Pegadinha:</b> não é R$ 1.020,00!</div></div>
+        <div class="node"><h3><span class="qn">Q16</span> CDI</h3><p><span class="key">Certificado de Depósito Interbancário</span>: taxa média dos <span class="key">empréstimos entre bancos</span>.</p><p>Principal <span class="key">referência</span> da renda fixa.</p></div>
+        <div class="node"><h3><span class="qn">Q17</span> CDB (% do CDI)</h3><p>Um CDB "110% do CDI" rende 110% do que o CDI render no período.</p></div>
+        <div class="node"><h3><span class="qn">Q18</span> Comparar financiamentos</h3><p>Some o <span class="key">custo de juros em R$</span> de cada opção e escolha a mais barata.</p><div class="tip"><b>Dica:</b> não olhe só o %.</div></div>
+      </div>
+    </section>
+
+    <section class="branch m3">
+      <div class="branch-head"><div class="branch-tag">MA03 · Módulo 3</div><h2 class="branch-title">Renda Variável</h2><div class="branch-sub">Mercado financeiro e bolsa de valores</div></div>
+      <div class="nodes">
+        <div class="node"><h3><span class="qn">Q19</span> Função do mercado financeiro</h3><p><span class="key">Intermediação</span>: levar recursos dos <span class="key">superavitários</span> (têm sobra) aos <span class="key">deficitários</span> (precisam).</p></div>
+        <div class="node"><h3><span class="qn">Q20</span> Ibovespa</h3><p><span class="key">Ibovespa (B3)</span> é o principal índice da bolsa — o "termômetro" das ações. Criado em <span class="key">1968</span>.</p></div>
+        <div class="node" style="background:var(--gold-soft);border-left-color:var(--gold)"><h3 style="color:var(--ink)">🎯 Bônus</h3><p><span class="key">Superavitário</span> = renda maior que os gastos (investidor).</p><p><span class="key">Deficitário</span> = precisa de crédito. O mercado conecta os dois.</p></div>
+      </div>
+    </section>
+  </div>
+
+  <div class="section-label"><h2>Não confunda os indicadores</h2></div>
+  <div class="table-wrap">
+    <table>
+      <caption>A pegadinha favorita é trocar um indicador pelo outro.</caption>
+      <thead><tr><th>Sigla</th><th>O que é</th><th>Para que serve</th></tr></thead>
+      <tbody>
+        <tr><th><span class="sig">IPCA</span></th><td>Índice de Preços ao Consumidor Amplo</td><td>Mede a <b>inflação</b> oficial. Reajusta preços.</td></tr>
+        <tr><th><span class="sig">Selic</span></th><td>Taxa básica de juros</td><td>Definida pelo <b>Copom</b>; influencia as demais taxas.</td></tr>
+        <tr><th><span class="sig">CDI</span></th><td>Juros entre bancos</td><td>Principal <b>referência da renda fixa</b>. Colado à Selic.</td></tr>
+        <tr><th><span class="sig">PIB</span></th><td>Produto Interno Bruto</td><td>Mede o <b>tamanho e crescimento</b> da economia.</td></tr>
+        <tr><th><span class="sig">Ibovespa</span></th><td>Índice da bolsa (B3)</td><td>"Termômetro" da <b>renda variável</b>. De 1968.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-label"><h2>Resumão de fórmulas</h2></div>
+  <div class="fgrid">
+    <div class="fcard"><div class="lbl">Renda familiar</div><div class="big">Renda = despesas + sobra</div><p>Tudo que gastou mais o que guardou.</p><p class="ex"><b>Ex.:</b> gastou 2.800 e guardou 200 → renda 3.000.</p></div>
+    <div class="fcard"><div class="lbl">Aumento e desconto</div><div class="big">Calcule o % de cada valor</div><p>Um passo de cada vez — nunca some %.</p><p class="ex"><b>Ex.:</b> 200 <b>+25%</b> = 250; <b>−20%</b> de 250 = 50 → volta a <b>200</b>.</p></div>
+    <div class="fcard"><div class="lbl">Renda perpétua</div><div class="big">Capital = renda ÷ i</div><p>Quanto ter para viver dos juros.</p><p class="ex"><b>Ex.:</b> 5.000 ÷ 0,005 = 1.000.000.</p></div>
+    <div class="fcard"><div class="lbl">Parcela de financiamento</div><div class="big">amortização + juros</div><p>Amortização abate a dívida; juros são o custo do dinheiro.</p></div>
+    <div class="fcard"><div class="lbl">Juros mês a mês</div><div class="big">Some o rendimento de cada mês</div><p>No 2º mês o % incide sobre o saldo já aumentado.</p><p class="ex"><b>Ex.:</b> 1% em 1.000: mês 1 → 1.010; mês 2 → 1.020,10.</p></div>
+    <div class="fcard"><div class="lbl">Indicadores</div><div class="big">IPCA · Selic · CDI · PIB</div><p>IPCA=inflação · Selic/CDI=juros · PIB=produção · Ibovespa=bolsa.</p></div>
+  </div>
+
+  <div class="section-label"><h2>Fuja destas pegadinhas</h2></div>
+  <div class="peg">
+    <div class="pcard"><h4>Somar porcentagens</h4><p>+25% e −20% <span class="no">não</span> dá −5%. <span class="ok">Faça passo a passo.</span></p></div>
+    <div class="pcard"><h4>Juros "arredondados"</h4><p>1% ao mês em 2 meses <span class="no">não</span> é 2% → <span class="ok">1.020,10</span>, não 1.020,00.</p></div>
+    <div class="pcard"><h4>Trocar os indicadores</h4><p>IPCA=inflação · Selic/CDI=juros · PIB=produção · Ibovespa=bolsa.</p></div>
+    <div class="pcard"><h4>Confundir os riscos</h4><p>FGC protege contra <span class="ok">risco de crédito</span>, <span class="no">não</span> mercado/liquidez/inflação.</p></div>
+    <div class="pcard"><h4>Comparar só pela taxa</h4><p>Menor % nem sempre é o menor custo. <span class="ok">Calcule os reais de juros.</span></p></div>
+    <div class="pcard"><h4>Simples × composto</h4><p>Compostos <span class="ok">crescem mais</span> que simples no tempo.</p></div>
+  </div>
+
+  <div class="section-label" id="prova"><h2>📝 Prova — 20 questões (vale nota)</h2></div>
+  <section class="exam" id="exam">
+    <div class="exam-head">
+      <span class="badge">Atividade avaliativa</span>
+      <h2>Faça a prova até o fim</h2>
+      <p>Responda as 20 questões, preencha nome e turma e toque em <b>“Enviar e corrigir”</b>. Você vê a nota na hora e a explicação de cada resposta. <b>Quem não fizer fica com a prova zerada.</b></p>
+      <div class="idrow">
+        <div class="field"><label for="nome">Seu nome completo</label><input id="nome" type="text" autocomplete="name" placeholder="Ex.: Ana Souza"></div>
+        <div class="field"><label for="turma">Turma</label><input id="turma" type="text" autocomplete="off" placeholder="Ex.: 9º A"></div>
+      </div>
+    </div>
+
+    <div class="result" id="result" hidden aria-live="polite">
+      <div class="who" id="rWho"></div>
+      <div class="score" id="rScore"></div>
+      <div class="sub" id="rSub"></div>
+      <div class="band" id="rBand"></div>
+      <div class="sendstate" id="rSend"></div>
+    </div>
+
+    <div class="qlist" id="qlist"></div>
+
+    <div class="actionbar">
+      <p class="warnmsg" id="warn" hidden></p>
+      <button class="btn" id="submitBtn">Enviar e corrigir</button>
+      <button class="btn secondary" id="retryBtn" hidden>Refazer a prova</button>
+    </div>
+  </section>
+
+  <footer>
+    <p><b>OLITEF — Olimpíada do Tesouro Direto de Educação Financeira</b> · Simulado 2026, Nível 2 (8º e 9º anos)<br>Revisão + prova de 20 questões. Boa prova! ✨</p>
+  </footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  /* tema */
+  (function(){var btn=document.getElementById('themeBtn'),root=document.documentElement;
+   function cur(){var t=root.getAttribute('data-theme');return t?t:(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');}
+   function paint(){btn.textContent=cur()==='dark'?'☀︎ Claro':'☾ Escuro';}
+   btn.addEventListener('click',function(){root.setAttribute('data-theme',cur()==='dark'?'light':'dark');paint();});paint();})();
+
+  /* supabase */
+  var sb=null;
+  try{ if(window.supabase && SUPABASE_URL.indexOf('http')===0){ sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY); } }catch(e){ sb=null; }
+
+  var QUESTIONS=[
+    {q:"O que é escambo?",o:["Troca direta de bens ou serviços, sem usar dinheiro","Um tipo de imposto do governo","A taxa de juros cobrada pelos bancos","Um investimento em ações da bolsa"],c:0,e:"Escambo é a troca direta (ex.: arroz por feijão), sem dinheiro como meio de troca."},
+    {q:"Numa hiperinflação, o dinheiro perde principalmente quais funções?",o:["Cor e tamanho das notas","Numeração de série","Reserva de valor e meio de troca","Peso e validade"],c:2,e:"Perdendo valor rápido, ninguém quer guardá-lo (reserva de valor) nem aceitá-lo (meio de troca)."},
+    {q:"Quem cria e administra o Pix?",o:["Uma empresa dos Estados Unidos","A ONU","Cada banco, sem regras comuns","O Banco Central do Brasil"],c:3,e:"O Pix é do Banco Central do Brasil — por isso é instantâneo e gratuito para pessoa física."},
+    {q:"Por que o Pix normalmente não funciona no exterior?",o:["Porque é um sistema nacional, ligado ao sistema financeiro brasileiro","Porque a internet lá é mais lenta","Porque é proibido viajar usando Pix","Porque o celular não liga fora do país"],c:0,e:"É soberania nacional. Fora do Brasil se usa moeda local ou cartão internacional."},
+    {q:"Uma família gastou R$ 2.800 e ainda guardou R$ 200. Qual foi a renda do mês?",o:["R$ 2.600","R$ 2.800","R$ 3.000","R$ 200"],c:2,e:"Renda = despesas + sobra = 2.800 + 200 = R$ 3.000."},
+    {q:"Sobre juros simples e compostos, é correto dizer:",o:["Os simples sempre rendem mais","Os compostos rendem “juros sobre juros” e crescem mais com o tempo","São exatamente iguais","Os compostos são proibidos no Brasil"],c:1,e:"Juros compostos incidem sobre o saldo acumulado, então crescem mais no longo prazo."},
+    {q:"R$ 100 rendem 10% ao mês em juros compostos. Quanto há após 2 meses?",o:["R$ 120","R$ 110","R$ 200","R$ 121"],c:3,e:"Mês 1: 100 → 110. Mês 2: 10% de 110 = 11 → R$ 121 (não é 120!)."},
+    {q:"Uma loja aumenta um produto de R$ 200 em 25% e depois dá 20% de desconto. O preço final é:",o:["Igual ao original: R$ 200","R$ 190","R$ 210","R$ 150"],c:0,e:"200 +25% = 250; 20% de 250 = 50 → 250 − 50 = R$ 200. Os % são de valores diferentes."},
+    {q:"O que o PIB mede?",o:["A inflação do país","A taxa básica de juros","A soma dos bens e serviços finais produzidos (a atividade econômica)","O total guardado na poupança"],c:2,e:"PIB = Produto Interno Bruto: mede o tamanho e o crescimento da economia."},
+    {q:"Para reajustar um preço acompanhando o custo de vida, qual índice usar?",o:["IPCA","Selic","PIB","Ibovespa"],c:0,e:"O IPCA é a inflação oficial. Selic e CDI são juros; PIB é produção."},
+    {q:"Na parcela de um financiamento, a parte que abate a dívida principal chama-se:",o:["Dividendo","Amortização","Inflação","Câmbio"],c:1,e:"Parcela = amortização (abate a dívida) + juros (custo do dinheiro)."},
+    {q:"Para viver de uma renda de R$ 5.000/mês com rendimento de 0,5% ao mês, quanto acumular?",o:["R$ 500.000","R$ 100.000","R$ 5.000.000","R$ 1.000.000"],c:3,e:"Capital = renda ÷ taxa = 5.000 ÷ 0,005 = R$ 1.000.000."},
+    {q:"O FGC protege o investidor contra qual risco (e até quanto)?",o:["Risco de mercado, sem limite","Risco de inflação, até R$ 1.000","Risco de crédito (calote), até R$ 250.000 por CPF","Nenhum risco"],c:2,e:"O FGC devolve o dinheiro se a instituição quebrar, até R$ 250.000 por CPF."},
+    {q:"Em que ano e por quem foi criada a Caderneta de Poupança?",o:["1861, por Dom Pedro II","1994, com o Plano Real","2020, junto com o Pix","1500, na chegada dos portugueses"],c:0,e:"A Poupança é de 1861, no Império de Dom Pedro II."},
+    {q:"Qual título público protege o poder de compra, rendendo acima da inflação?",o:["Tesouro Prefixado","Tesouro IPCA+","Tesouro Selic","Caderneta de Poupança"],c:1,e:"O Tesouro IPCA+ rende a inflação (IPCA) mais uma taxa fixa → ganho real."},
+    {q:"O Tesouro Direto (2002) é uma parceria do Tesouro Nacional com:",o:["O FMI","A ONU","Uma empresa estrangeira","A B3 (a Bolsa)"],c:3,e:"Parceria Tesouro Nacional + B3 para pessoas físicas comprarem títulos públicos."},
+    {q:"R$ 1.000 em renda fixa a 1% ao mês (juros compostos), após 2 meses, viram:",o:["R$ 1.020,10","R$ 1.020,00","R$ 1.200,00","R$ 1.010,00"],c:0,e:"Mês 1: 1.000 → 1.010. Mês 2: 1% de 1.010 = 10,10 → R$ 1.020,10."},
+    {q:"O CDI é:",o:["Um imposto sobre investimentos","A taxa de câmbio do dólar","A taxa média dos empréstimos entre bancos (referência da renda fixa)","O índice da bolsa de valores"],c:2,e:"CDBs rendem “% do CDI”; ele anda colado à Selic."},
+    {q:"A principal função do mercado financeiro é:",o:["Imprimir dinheiro","Ligar quem tem sobra (superavitários) a quem precisa de dinheiro (deficitários)","Controlar os preços dos supermercados","Obrigar empresas a dividir seus lucros"],c:1,e:"A intermediação: transfere recursos dos poupadores para quem investe ou consome."},
+    {q:"O Ibovespa é:",o:["A taxa básica de juros","O índice de inflação","Um título do Tesouro","O principal índice da Bolsa (B3), termômetro do mercado de ações"],c:3,e:"Criado em 1968, é a principal referência da renda variável no Brasil."}
+  ];
+
+  var LETTERS=["A","B","C","D"];
+  var qlist=document.getElementById('qlist'),exam=document.getElementById('exam'),submitted=false;
+
+  QUESTIONS.forEach(function(item,qi){
+    var card=document.createElement('div');card.className='qcard';
+    var qt=document.createElement('p');qt.className='qtext';qt.textContent=item.q;card.appendChild(qt);
+    var opts=document.createElement('div');opts.className='opts';
+    item.o.forEach(function(text,oi){
+      var lab=document.createElement('label');lab.className='opt';lab.dataset.qi=qi;lab.dataset.oi=oi;
+      var inp=document.createElement('input');inp.type='radio';inp.name='q'+qi;inp.value=oi;
+      var lt=document.createElement('span');lt.className='lt';lt.textContent=LETTERS[oi];
+      var tx=document.createElement('span');tx.className='ot';tx.textContent=text;
+      lab.appendChild(inp);lab.appendChild(lt);lab.appendChild(tx);opts.appendChild(lab);
+    });
+    card.appendChild(opts);
+    var ex=document.createElement('div');ex.className='expl';ex.hidden=true;
+    ex.innerHTML='<b>Resposta correta: '+LETTERS[item.c]+'.</b> '+item.e;
+    card.appendChild(ex);qlist.appendChild(card);
+  });
+
+  var submitBtn=document.getElementById('submitBtn'),retryBtn=document.getElementById('retryBtn'),
+      warn=document.getElementById('warn'),result=document.getElementById('result');
+
+  function chosen(qi){var el=document.querySelector('input[name="q'+qi+'"]:checked');return el?parseInt(el.value,10):-1;}
+
+  submitBtn.addEventListener('click',async function(){
+    if(submitted)return;
+    var nome=document.getElementById('nome').value.trim();
+    var turma=document.getElementById('turma').value.trim();
+    var missing=[];for(var i=0;i<QUESTIONS.length;i++){if(chosen(i)===-1)missing.push(i+1);}
+    if(!nome||!turma){warn.hidden=false;warn.textContent='Preencha seu nome e sua turma antes de enviar.';return;}
+    if(missing.length){warn.hidden=false;warn.textContent='Faltou responder '+missing.length+' questão(ões): '+missing.join(', ')+'.';
+      var f=qlist.querySelectorAll('.qcard')[missing[0]-1];if(f)f.scrollIntoView({behavior:'smooth',block:'center'});return;}
+    warn.hidden=true;
+
+    var acertos=0,respostas=[];
+    QUESTIONS.forEach(function(item,qi){
+      var pick=chosen(qi);respostas.push(pick);
+      qlist.querySelectorAll('.opt[data-qi="'+qi+'"]').forEach(function(lab){
+        var oi=parseInt(lab.dataset.oi,10);lab.querySelector('input').disabled=true;
+        if(oi===item.c){lab.classList.add('correct');var m=document.createElement('span');m.className='mark';m.textContent='✓ correta';lab.appendChild(m);}
+        else if(oi===pick){lab.classList.add('wrong');var w=document.createElement('span');w.className='mark';w.textContent='✗ sua resposta';lab.appendChild(w);}
+      });
+      if(pick===item.c)acertos++;
+      qlist.querySelectorAll('.qcard')[qi].querySelector('.expl').hidden=false;
+    });
+
+    var total=QUESTIONS.length, nota=Math.round(acertos/total*100)/10, pct=Math.round(acertos/total*100);
+    var notaTxt=nota.toString().replace('.',',');
+    document.getElementById('rWho').textContent=nome+' · '+turma;
+    document.getElementById('rScore').textContent=acertos+' / '+total+' acertos';
+    var agora=new Date();
+    var dd=('0'+agora.getDate()).slice(-2)+'/'+('0'+(agora.getMonth()+1)).slice(-2)+'/'+agora.getFullYear();
+    var hh=('0'+agora.getHours()).slice(-2)+':'+('0'+agora.getMinutes()).slice(-2);
+    document.getElementById('rSub').textContent='Nota '+notaTxt+' — concluído em '+dd+' às '+hh;
+    var band=document.getElementById('rBand');
+    if(pct>=70){band.textContent='Mandou bem! 🎉';band.style.background='var(--ok-soft)';band.style.color='var(--ok)';}
+    else if(pct>=50){band.textContent='Quase lá — revise as erradas.';band.style.background='var(--gold-soft)';band.style.color='var(--gold)';}
+    else{band.textContent='Bora revisar e refazer!';band.style.background='var(--warn-soft)';band.style.color='var(--warn)';}
+    result.hidden=false;exam.classList.add('done');submitted=true;
+    submitBtn.hidden=true;retryBtn.hidden=false;
+    result.scrollIntoView({behavior:'smooth',block:'center'});
+
+    /* envia ao professor */
+    var send=document.getElementById('rSend');
+    if(!sb){send.className='sendstate errmsg';send.textContent='⚠ Nota calculada, mas o envio ao professor não está configurado. Tire um print desta tela.';return;}
+    send.className='sendstate';send.textContent='Enviando ao professor…';
+    try{
+      var res=await sb.from(TABELA).insert({
+        nome:nome, turma:turma, acertos:acertos, total:total, nota:nota, respostas:respostas
+      });
+      if(res.error){throw res.error;}
+      send.className='sendstate okmsg';send.textContent='✅ Enviado ao professor com sucesso!';
+    }catch(err){
+      send.className='sendstate errmsg';
+      send.textContent='⚠ Nota calculada, mas falhou o envio ('+(err&&err.message?err.message:'sem conexão')+'). Tire um print desta tela para o professor.';
+    }
+  });
+
+  retryBtn.addEventListener('click',function(){location.reload();});
+</script>
+</body>
+</html>
