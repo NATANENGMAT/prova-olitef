@@ -13,6 +13,7 @@
   const SUPABASE_URL      = "https://jndgmbmiahowwuildjxg.supabase.co";   // ex.: https://abcdxyz.supabase.co
   const SUPABASE_ANON_KEY = "sb_publishable_Mp2fcSPlp2TuR8l3fjGyQw_DFKEDNta";       // chave "anon public"
   const TABELA            = "respostas";                    // não precisa mudar
+  const ENCERRADA         = true;                          // true = prova encerrada (sem novos envios)
 </script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -60,6 +61,9 @@
   .dot{width:9px;height:9px;border-radius:50%;flex:none}
   .howto{margin:14px 2px 0;font-size:.92rem;color:var(--ink-soft)}
   .howto b{color:var(--ink)}
+  .closed-banner{background:linear-gradient(180deg,var(--warn),#a5391a);color:#fff;border-radius:18px;padding:20px 22px;margin-bottom:18px;box-shadow:var(--shadow-lift)}
+  .closed-banner h2{margin:0 0 4px;font-family:"Bricolage Grotesque","Nunito",sans-serif;font-weight:800;font-size:1.35rem}
+  .closed-banner p{margin:0;font-size:.98rem;opacity:.97}
 
   .branches{display:grid;gap:18px;margin-top:24px;grid-template-columns:repeat(3,1fr)}
   @media (max-width:900px){.branches{grid-template-columns:1fr}}
@@ -185,6 +189,8 @@
 <button class="theme-toggle" id="themeBtn" aria-label="Alternar tema claro/escuro">Tema</button>
 
 <div class="wrap">
+
+  <div class="closed-banner" id="closedBanner" hidden><h2>🔒 Atividade encerrada</h2><p>O prazo terminou e os envios estão fechados. Obrigado a quem participou! Você ainda pode revisar o conteúdo abaixo.</p></div>
 
   <header class="hub">
     <p class="eyebrow">Revisão + Prova · Educação Financeira</p>
@@ -439,6 +445,15 @@
   });
 
   retryBtn.addEventListener('click',function(){location.reload();});
+
+  /* ---------- encerramento ---------- */
+  if (typeof ENCERRADA !== 'undefined' && ENCERRADA) {
+    var cb=document.getElementById('closedBanner'); if(cb) cb.hidden=false;
+    ['turma','nome','submitBtn'].forEach(function(id){var el=document.getElementById(id); if(el) el.disabled=true;});
+    var sbtn=document.getElementById('submitBtn'); if(sbtn) sbtn.textContent='Atividade encerrada';
+    var badge=document.querySelector('.exam-head .badge'); if(badge) badge.textContent='Encerrada';
+    var ehp=document.querySelector('.exam-head p'); if(ehp) ehp.innerHTML='<b>Esta atividade foi encerrada.</b> O prazo terminou e não é mais possível enviar. Você ainda pode revisar o conteúdo acima. 🔒';
+  }
 </script>
 </body>
 </html>
